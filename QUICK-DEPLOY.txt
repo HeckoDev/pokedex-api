@@ -1,0 +1,85 @@
+╔══════════════════════════════════════════════════════════════╗
+║     🚀 DÉPLOIEMENT RAPIDE API SUR RENDER                    ║
+╚══════════════════════════════════════════════════════════════╝
+
+📍 ÉTAPE 1 : Créer PostgreSQL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Aller sur : https://render.com
+2. Se connecter avec GitHub
+3. Cliquer : New + → PostgreSQL
+4. Remplir :
+   • Name: pokedex-db
+   • Database: pokedex
+   • User: pokedex_user
+5. Créer et NOTER les credentials !
+
+�� ÉTAPE 2 : Créer Web Service
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Cliquer : New + → Web Service
+2. Connect GitHub → pokedex-vue
+3. Configuration :
+   • Name: pokedex-api
+   • Root Directory: pokedex-api
+   • Environment: Go
+   • Build: go build -o main .
+   • Start: ./main
+
+📍 ÉTAPE 3 : Variables d'environnement
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Avant de déployer, ajouter ces 8 variables :
+
+┌────────────────────┬───────────────────────────────┐
+│ Variable           │ Valeur                        │
+├────────────────────┼───────────────────────────────┤
+│ DB_HOST            │ dpg-xxx.oregon-postgres...    │
+│ POSTGRES_DB        │ pokedex                       │
+│ POSTGRES_USER      │ pokedex_user                  │
+│ POSTGRES_PASSWORD  │ <depuis PostgreSQL Info>      │
+│ POSTGRES_PORT      │ 5432                          │
+│ JWT_SECRET         │ K68Rp8UArf3NnYo1iH3u0kFv...  │
+│ GIN_MODE           │ release                       │
+│ API_PORT           │ 8080                          │
+└────────────────────┴───────────────────────────────┘
+
+💡 Générer JWT_SECRET :
+   openssl rand -base64 32
+
+📍 ÉTAPE 4 : Déployer
+━━━━━━━━━━━━━━━━━━━━━━
+1. Cliquer : Create Web Service
+2. Attendre 3-5 minutes
+3. Vérifier logs → "Your service is live 🎉"
+
+📍 ÉTAPE 5 : Tester
+━━━━━━━━━━━━━━━━━━━
+URL : https://pokedex-api-xxxx.onrender.com
+
+Test :
+curl -X POST https://votre-api.onrender.com/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","email":"test@test.com","password":"test123"}'
+
+Réponse OK : {"token":"eyJ...","user":{...}}
+
+📍 ÉTAPE 6 : Mettre à jour frontend
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Éditer : pokedex-vue/.env.production
+   VITE_API_URL=https://votre-api.onrender.com
+
+2. Éditer : pokedex-vue/.env
+   VITE_API_URL=https://votre-api.onrender.com
+
+3. Commit et push :
+   git add .
+   git commit -m "Update API URL"
+   git push origin main
+
+╔══════════════════════════════════════════════════════════════╗
+║ ✅ C'EST FAIT !                                              ║
+║                                                              ║
+║ Frontend : https://heckodev.github.io/pokedex-vue/          ║
+║ Backend  : https://votre-api.onrender.com                   ║
+╚══════════════════════════════════════════════════════════════╝
+
+📚 Documentation complète : DEPLOY-RENDER.md
+🆘 Problème ? Voir les logs : Dashboard > Service > Logs

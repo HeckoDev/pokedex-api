@@ -1,0 +1,6 @@
+*.db
+*.log
+.env
+.DS_Store
+pokedex-api
+main

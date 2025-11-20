@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pokedex-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pokedex}
+      POSTGRES_USER: ${POSTGRES_USER:-pokedex_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pokedex_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pokedex-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pokedex-api
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-pokedex_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-pokedex_password}
+      DB_NAME: ${POSTGRES_DB:-pokedex}
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      GIN_MODE: ${GIN_MODE:-debug}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pokedex-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  pokedex-network:
+    driver: bridge
