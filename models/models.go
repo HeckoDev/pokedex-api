@@ -14,8 +14,13 @@ type User struct {
 	Username  string         `gorm:"unique;not null" json:"username"`
 	Email     string         `gorm:"unique;not null" json:"email"`
 	Password  string         `gorm:"not null" json:"-"`
-	Favorites []Favorite     `json:"favorites,omitempty"`
-	Teams     []Team         `json:"teams,omitempty"`
+	// Email verification
+	EmailVerified         bool       `gorm:"default:false" json:"email_verified"`
+	VerificationCode      string     `gorm:"default:''" json:"-"`
+	VerificationExpiresAt *time.Time `json:"-"`
+	VerificationSentAt    *time.Time `json:"-"`
+	Favorites             []Favorite `json:"favorites,omitempty"`
+	Teams                 []Team     `json:"teams,omitempty"`
 }
 
 type Favorite struct {
@@ -58,6 +63,33 @@ type RegisterRequest struct {
 type LoginRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
+}
+
+type VerifyEmailRequest struct {
+	Email string `json:"email" binding:"required,email"`
+	Code  string `json:"code" binding:"required,len=6"`
+}
+
+type ResendVerificationRequest struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+type UpdateProfileRequest struct {
+	Username string `json:"username" binding:"required,min=3,max=20"`
+}
+
+type ChangePasswordRequest struct {
+	CurrentPassword string `json:"current_password" binding:"required"`
+	NewPassword     string `json:"new_password" binding:"required,min=8"`
+}
+
+type DeleteAccountRequest struct {
+	Password string `json:"password" binding:"required"`
+}
+
+type MessageResponse struct {
+	Message string `json:"message"`
+	Email   string `json:"email,omitempty"`
 }
 
 type AuthResponse struct {
